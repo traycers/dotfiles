@@ -1,0 +1,32 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# VS Code Dark+ theme, see palette.md. Glyphs need the JetBrainsMono Nerd
+# Font set in alacritty/alacritty/alacritty.toml — starship has no font
+# setting of its own, it just relies on whatever the terminal renders.
+
+format = """
+[](bg:#0e639c)$directory[](bg:#569cd6 fg:#0e639c)$git_branch$git_status[](fg:#569cd6)
+$character"""
+
+[directory]
+style = "bg:#0e639c fg:#1e1e1e"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+style = "bg:#569cd6 fg:#1e1e1e"
+format = "[ $symbol$branch ]($style)"
+symbol = " "
+
+[git_status]
+style = "bg:#cca700 fg:#1e1e1e"
+format = "[ $all_status$ahead_behind ]($style)"
+
+[character]
+success_symbol = "[➜](bold #89d185)"
+error_symbol = "[➜](bold #f44747)"
+
+[cmd_duration]
+style = "fg:#858585"
+format = "took [$duration]($style) "

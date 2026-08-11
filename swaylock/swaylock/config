@@ -1,0 +1,32 @@
+# swaylock — VS Code Dark+ theme, see palette.md
+# Note: swaylock wants bare hex values here, no leading '#'.
+
+indicator
+clock
+indicator-radius=130
+indicator-thickness=14
+
+font=JetBrainsMono Nerd Font
+font-size=18
+
+ring-color=1e1e1e
+inside-color=252526
+text-color=d4d4d4
+line-uses-ring
+
+key-hl-color=0e639c
+bs-hl-color=cca700
+
+ring-ver-color=569cd6
+inside-ver-color=252526
+text-ver-color=d4d4d4
+
+ring-wrong-color=f44747
+inside-wrong-color=252526
+text-wrong-color=f44747
+
+ring-clear-color=cca700
+inside-clear-color=252526
+text-clear-color=1e1e1e
+
+separator-color=454545
