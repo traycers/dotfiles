@@ -9,6 +9,22 @@
     alacritty
     neovim
     nerd-fonts.iosevka
+
+    # CLI tools
+    tmux
+    fzf
+    ripgrep
+    yazi
+    fd
+    curl
+    dust
+    bat
+    jq
+
+    # GUI, non-DE-specific
+    vscode
+    firefox
+    ffmpeg
   ];
 
   fonts.fontconfig.enable = true;
