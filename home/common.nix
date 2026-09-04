@@ -20,6 +20,7 @@
     dust
     bat
     jq
+    nushell
 
     # GUI, non-DE-specific
     vscode

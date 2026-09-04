@@ -12,5 +12,19 @@
     swappy
     swayidle
     swaylock
+
+    # support tools the niri keybinds/waybar modules shell out to
+    grim
+    slurp
+    wl-clipboard
+    cliphist
+    libnotify
+
+    # Usually already provided by the distro's own bluetoothd/NetworkManager/
+    # pipewire session — uncomment only if `which bluetoothctl nmcli wpctl`
+    # comes back empty on this machine.
+    # bluez
+    # networkmanager
+    # wireplumber
   ];
 }
