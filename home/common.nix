@@ -25,6 +25,8 @@
     vscode
     firefox
     ffmpeg
+    gimp
+    obs-studio
   ];
 
   fonts.fontconfig.enable = true;
