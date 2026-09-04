@@ -19,6 +19,13 @@
     wl-clipboard
     cliphist
     libnotify
+    brightnessctl
+    swww
+
+    # niri speaks the same screencast/remote-desktop D-Bus interfaces as
+    # GNOME/mutter — this is the portal it actually needs, not
+    # xdg-desktop-portal-wlr. Required for OBS Studio screen capture.
+    xdg-desktop-portal-gnome
 
     # Usually already provided by the distro's own bluetoothd/NetworkManager/
     # pipewire session — uncomment only if `which bluetoothctl nmcli wpctl`
