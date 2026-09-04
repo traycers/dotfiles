@@ -20,7 +20,7 @@
     cliphist
     libnotify
     brightnessctl
-    swww
+    awww # formerly "swww" — same project, renamed upstream/in nixpkgs
 
     # niri speaks the same screencast/remote-desktop D-Bus interfaces as
     # GNOME/mutter — this is the portal it actually needs, not
@@ -34,4 +34,36 @@
     # networkmanager
     # wireplumber
   ];
+
+  # niri doesn't import WAYLAND_DISPLAY/session env into systemd on its own —
+  # config.kdl needs to run `dbus-update-activation-environment --systemd
+  # WAYLAND_DISPLAY XDG_CURRENT_DESKTOP` (and start graphical-session.target)
+  # before these units can come up. Tracked in .scratch/nix-migration/issues/01-port-niri-config.md.
+  systemd.user.services = {
+    awww-daemon = {
+      Unit = {
+        Description = "awww (swww) wallpaper daemon";
+        PartOf = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.awww}/bin/awww-daemon";
+        Restart = "on-failure";
+      };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
+
+    xdg-desktop-portal-gnome = {
+      Unit = {
+        Description = "Portal service (GNOME/mutter backend — matches niri's screencast protocol)";
+        PartOf = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.xdg-desktop-portal-gnome}/libexec/xdg-desktop-portal-gnome";
+        Restart = "on-failure";
+      };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
+  };
 }
