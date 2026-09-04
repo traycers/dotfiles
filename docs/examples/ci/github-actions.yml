@@ -1,0 +1,53 @@
+# Шаблон для .github/workflows/build.yml — адаптируйте под свой namespace/URLs перед использованием.
+# Демонстрирует: установку Nix через официальный action, аутентификацию к приватным
+# репо через access token, запуск select-branch.sh (глава 07), сборку и push в кеш.
+
+name: build
+
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  CUSTOM_BRANCH: special-123123_add_feature
+  BASE_BRANCH: special
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+        # ставит Nix с уже включёнными flakes, без ручного редактирования nix.conf
+
+      - name: configure access token for private repos
+        # GH_ACCESS_TOKEN — PAT с правом на чтение нужных приватных репозиториев,
+        # хранится в Settings -> Secrets and variables -> Actions
+        run: |
+          mkdir -p ~/.config/nix
+          echo "access-tokens = github.com=${{ secrets.GH_ACCESS_TOKEN }} gitlab.com=${{ secrets.GITLAB_ACCESS_TOKEN }}" >> ~/.config/nix/nix.conf
+
+      - name: resolve branch per repo and build
+        run: |
+          cat > repos.txt <<'EOF'
+          libB https://github.com/your-org/libB.git
+          libC https://github.com/your-org/libC.git
+          EOF
+          chmod +x examples/scripts/select-branch.sh
+          examples/scripts/select-branch.sh \
+            --custom-branch "$CUSTOM_BRANCH" \
+            --base-branch "$BASE_BRANCH" \
+            --repos repos.txt \
+            -- .#default
+
+      - name: push to binary cache (optional)
+        if: env.CACHIX_AUTH_TOKEN != ''
+        env:
+          CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        run: nix run nixpkgs#cachix -- push your-cache-name ./result
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-result
+          path: result

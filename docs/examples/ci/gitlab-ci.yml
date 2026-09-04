@@ -1,0 +1,45 @@
+# Шаблон для .gitlab-ci.yml — адаптируйте под свой namespace/URLs перед использованием.
+# Демонстрирует: установку Nix в CI, аутентификацию к приватным репо через access token,
+# запуск select-branch.sh для branch-fallback логики (глава 07), сборку и push в binary cache.
+
+stages:
+  - build
+
+variables:
+  CUSTOM_BRANCH: "special-123123_add_feature"
+  BASE_BRANCH: "special"
+
+build:
+  stage: build
+  image: nixos/nix:latest
+  variables:
+    # GitLab уже даёт CI_JOB_TOKEN с доступом на чтение к репозиториям того же
+    # namespace/группы — для доступа к ДРУГИМ проектам используйте предварительно
+    # созданный access token в защищённой CI-переменной GITLAB_ACCESS_TOKEN.
+    GITLAB_ACCESS_TOKEN: "$GITLAB_ACCESS_TOKEN"
+  before_script:
+    # включаем flakes и nix-command — образ nixos/nix по умолчанию их не включает
+    - mkdir -p ~/.config/nix
+    - echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+    # аутентификация к приватным репозиториям GitLab через access-tokens (глава 06)
+    - echo "access-tokens = gitlab.com=${GITLAB_ACCESS_TOKEN}" >> ~/.config/nix/nix.conf
+  script:
+    # repos.txt должен перечислять ВСЕ узлы дерева зависимостей (кроме самого
+    # текущего репозитория), см. tutorial/07-branch-override-fallback.md
+    - |
+      cat > repos.txt <<EOF
+      libB https://gitlab.com/your-org/libB.git
+      libC https://gitlab.com/your-org/libC.git
+      EOF
+    - chmod +x examples/scripts/select-branch.sh
+    - >
+      examples/scripts/select-branch.sh
+      --custom-branch "$CUSTOM_BRANCH"
+      --base-branch "$BASE_BRANCH"
+      --repos repos.txt
+      -- .#default
+    # опционально: пушим результат в бинарный кеш (Cachix/attic), см. главу 09
+    - test -n "$CACHIX_AUTH_TOKEN" && nix run nixpkgs#cachix -- push your-cache-name ./result || true
+  artifacts:
+    paths:
+      - result
